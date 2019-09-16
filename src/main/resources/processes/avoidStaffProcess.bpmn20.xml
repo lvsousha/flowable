@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+  xmlns:flowable="http://flowable.org/bpmn"
+  typeLanguage="http://www.w3.org/2001/XMLSchema"
+  expressionLanguage="http://www.w3.org/1999/XPath"
+  targetNamespace="http://www.flowable.org/processdef">
+  <process id="avoidStaffProcess" name="回避仲裁员" isExecutable="true" isClosed="false" processType="None">
+    <startEvent id="start" name="申请"></startEvent>
+    <userTask id="assistantAudit" name="助理审核" flowable:assignee="${assistantId}"></userTask>
+    <sequenceFlow id="flow1" name="提交申请" sourceRef="start" targetRef="assistantAudit"></sequenceFlow>
+    <userTask id="leader_audit" name="部门负责人审核" flowable:candidateGroups="leader"></userTask>
+    <sequenceFlow id="assistant_agree" name="助理同意" sourceRef="assistantAudit" targetRef="leader_audit"></sequenceFlow>
+    <userTask id="deputy_secretary_general_audit" name="副秘书长审核" flowable:candidateGroups="deputySecretaryGeneral"></userTask>
+    <sequenceFlow id="leader_agree" name="部门负责人同意" sourceRef="leader_audit" targetRef="deputy_secretary_general_audit">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${operate=='agree'}]]></conditionExpression>
+    </sequenceFlow>
+    <userTask id="secretary_general_audit" name="秘书长审核" flowable:candidateGroups="SecretaryGeneral"></userTask>
+    <sequenceFlow id="deputy_secretary_general_agree" name="副秘书长同意" sourceRef="deputy_secretary_general_audit" targetRef="secretary_general_audit">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${operate=='agree'}]]></conditionExpression>
+    </sequenceFlow>
+    <userTask id="assistant_apply_decide_book" name="助理提交决定书" flowable:assignee="${assistantId}"></userTask>
+    <sequenceFlow id="secretary_general_agree_or_disagree" name="秘书长同意或不同意" sourceRef="secretary_general_audit" targetRef="assistant_apply_decide_book">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${operate=='agree' or operate=='disagree'}]]></conditionExpression>
+    </sequenceFlow>
+    <userTask id="leader_audit_decide_book" name="部门负责人审核决定书" flowable:candidateGroups="leader"></userTask>
+    <sequenceFlow id="assistant_agree_decide_book" name="助理同意决定书" sourceRef="assistant_apply_decide_book" targetRef="leader_audit_decide_book">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${operate=='agree'}]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="leader_agree_decide_book" name="部门负责人同意决定书" sourceRef="leader_audit_decide_book" targetRef="endevent1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${operate=='agree'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="leader_send_back" name="部门负责人退回" sourceRef="leader_audit" targetRef="assistantAudit">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${operate=='sendBack'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="deputy_secretary_general_send_back" name="副秘书长退回" sourceRef="deputy_secretary_general_audit" targetRef="assistantAudit">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${operate=='sendBack'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="secretary_general_send_back" name="秘书长退回" sourceRef="secretary_general_audit" targetRef="assistantAudit">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${operate=='sendBack'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="leader_disagree" name="部门负责人不同意" sourceRef="leader_audit" targetRef="assistant_apply_decide_book">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${operate=='disagree'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="deputy_secretary_general_disagree" name="副秘书长不同意" sourceRef="deputy_secretary_general_audit" targetRef="assistant_apply_decide_book">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${operate=='disagree'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="leader_send_back_decide_book" name="部门负责人退回决定书" sourceRef="leader_audit_decide_book" targetRef="assistant_apply_decide_book"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_avoidStaffProcess">
+    <bpmndi:BPMNPlane bpmnElement="avoidStaffProcess" id="BPMNPlane_avoidStaffProcess">
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+        <omgdc:Bounds height="35.0" width="35.0" x="33.0" y="110.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="assistantAudit" id="BPMNShape_assistantAudit">
+        <omgdc:Bounds height="55.0" width="105.0" x="130.0" y="100.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="leader_audit" id="BPMNShape_leader_audit">
+        <omgdc:Bounds height="55.0" width="105.0" x="270.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="deputy_secretary_general_audit" id="BPMNShape_deputy_secretary_general_audit">
+        <omgdc:Bounds height="55.0" width="105.0" x="420.0" y="340.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="secretary_general_audit" id="BPMNShape_secretary_general_audit">
+        <omgdc:Bounds height="55.0" width="105.0" x="570.0" y="460.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="assistant_apply_decide_book" id="BPMNShape_assistant_apply_decide_book">
+        <omgdc:Bounds height="55.0" width="105.0" x="690.0" y="100.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="leader_audit_decide_book" id="BPMNShape_leader_audit_decide_book">
+        <omgdc:Bounds height="70.0" width="105.0" x="930.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="965.0" y="385.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="68.0" y="127.0"></omgdi:waypoint>
+        <omgdi:waypoint x="130.0" y="127.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="68.0" y="127.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="assistant_agree" id="BPMNEdge_assistant_agree">
+        <omgdi:waypoint x="182.0" y="155.0"></omgdi:waypoint>
+        <omgdi:waypoint x="182.0" y="227.0"></omgdi:waypoint>
+        <omgdi:waypoint x="270.0" y="227.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="182.0" y="155.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="leader_agree" id="BPMNEdge_leader_agree">
+        <omgdi:waypoint x="322.0" y="255.0"></omgdi:waypoint>
+        <omgdi:waypoint x="322.0" y="367.0"></omgdi:waypoint>
+        <omgdi:waypoint x="420.0" y="367.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="322.0" y="255.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="deputy_secretary_general_agree" id="BPMNEdge_deputy_secretary_general_agree">
+        <omgdi:waypoint x="472.0" y="395.0"></omgdi:waypoint>
+        <omgdi:waypoint x="472.0" y="487.0"></omgdi:waypoint>
+        <omgdi:waypoint x="570.0" y="487.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="472.0" y="395.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="secretary_general_agree_or_disagree" id="BPMNEdge_secretary_general_agree_or_disagree">
+        <omgdi:waypoint x="675.0" y="487.0"></omgdi:waypoint>
+        <omgdi:waypoint x="742.0" y="487.0"></omgdi:waypoint>
+        <omgdi:waypoint x="742.0" y="155.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="42.0" width="100.0" x="739.0" y="450.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="assistant_agree_decide_book" id="BPMNEdge_assistant_agree_decide_book">
+        <omgdi:waypoint x="742.0" y="155.0"></omgdi:waypoint>
+        <omgdi:waypoint x="803.0" y="235.0"></omgdi:waypoint>
+        <omgdi:waypoint x="930.0" y="235.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="742.0" y="155.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="leader_agree_decide_book" id="BPMNEdge_leader_agree_decide_book">
+        <omgdi:waypoint x="982.0" y="270.0"></omgdi:waypoint>
+        <omgdi:waypoint x="982.0" y="385.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="42.0" width="100.0" x="981.0" y="309.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="leader_send_back" id="BPMNEdge_leader_send_back">
+        <omgdi:waypoint x="982.0" y="200.0"></omgdi:waypoint>
+        <omgdi:waypoint x="982.0" y="127.0"></omgdi:waypoint>
+        <omgdi:waypoint x="795.0" y="127.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="42.0" width="100.0" x="981.0" y="142.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="deputy_secretary_general_send_back" id="BPMNEdge_deputy_secretary_general_send_back">
+        <omgdi:waypoint x="472.0" y="340.0"></omgdi:waypoint>
+        <omgdi:waypoint x="472.0" y="127.0"></omgdi:waypoint>
+        <omgdi:waypoint x="235.0" y="127.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="460.0" y="291.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="secretary_general_send_back" id="BPMNEdge_secretary_general_send_back">
+        <omgdi:waypoint x="622.0" y="460.0"></omgdi:waypoint>
+        <omgdi:waypoint x="622.0" y="127.0"></omgdi:waypoint>
+        <omgdi:waypoint x="235.0" y="127.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="625.0" y="421.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="leader_disagree" id="BPMNEdge_leader_disagree">
+        <omgdi:waypoint x="375.0" y="227.0"></omgdi:waypoint>
+        <omgdi:waypoint x="742.0" y="227.0"></omgdi:waypoint>
+        <omgdi:waypoint x="742.0" y="155.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="42.0" width="100.0" x="375.0" y="227.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="deputy_secretary_general_disagree" id="BPMNEdge_deputy_secretary_general_disagree">
+        <omgdi:waypoint x="525.0" y="367.0"></omgdi:waypoint>
+        <omgdi:waypoint x="742.0" y="367.0"></omgdi:waypoint>
+        <omgdi:waypoint x="742.0" y="155.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="525.0" y="367.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
