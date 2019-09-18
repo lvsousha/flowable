@@ -25,10 +25,10 @@ public class Main {
   public void avoidStaffProcess() {
     ProcessEngine processEngine = init();
     // deploy(processEngine, "processes/avoidStaffProcess.bpmn20.xml");
-    // apply(processEngine, "仲裁员助理Id");
-    assistantAudit(processEngine, "22505");
+    apply(processEngine, "仲裁员助理2");
+    // assistantAudit(processEngine, "22505");
     // leaderSendBack(processEngine, "22505");
-    getTaskUser(processEngine, "仲裁员助理Id");
+    getTaskUser(processEngine, "仲裁员助理2");
     getTaskGroup(processEngine, "leader");
   }
 
